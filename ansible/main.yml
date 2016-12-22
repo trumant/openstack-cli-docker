@@ -1,0 +1,72 @@
+# This should be your Ansible playbooks to provision your containers.
+# An inventory will be automatically created using the names of the services
+# from your container.yml file.
+# Add any roles or other modules you'll need to this directory too.
+# For many examples of roles, check out Ansible Galaxy: https://galaxy.ansible.com/
+#
+---
+- hosts: all
+  gather_facts: false
+  vars:
+    openstack_version: newton
+    packages:
+      - build-essential
+      - libffi-dev
+      - libssl-dev
+      - python-dev
+      - openssl
+      - wget
+    openstack_clients:
+      - aodhclient
+      - python-barbicanclient
+      - python-ceilometerclient
+      - python-cinderclient
+      - python-congressclient
+      - python-designateclient
+      - python-heatclient
+      - python-glanceclient
+      - python-ironic-inspector-client
+      - python-ironicclient
+      - python-karborclient
+      - python-keystoneclient
+      - python-magnumclient
+      - python-manilaclient
+      - python-mistralclient
+      - python-muranoclient
+      - python-monascaclient
+      - python-neutronclient
+      - python-novaclient
+      - python-openstackclient
+      - python-saharaclient
+      - python-searchlightclient
+      - python-senlinclient
+      - python-smaugclient
+      - python-solumclient
+      - python-swiftclient
+      - python-tackerclient
+      - python-troveclient
+      - python-watcherclient
+      - python-zaqarclient
+
+  pre_tasks:
+    - name: Install Python 2 for Ansible
+      raw: apt -y update && apt install -y python-minimal python-pip
+
+  tasks:
+    - name: Install packages
+      apt:
+        name: "{{ item }}"
+        update_cache: yes
+      with_items: "{{ packages }}"
+
+    - name: Fetch the versions requirements file
+      get_url:
+        url: "https://raw.githubusercontent.com/openstack/requirements/stable/{{ openstack_version }}/global-requirements.txt"
+        dest: /tmp/openstack_cli_requirements.txt
+
+    - name: Install the clients
+      pip:
+        name: "{{ item }}"
+        extra_args: "-c /tmp/openstack_cli_requirements.txt"
+      with_items: "{{ openstack_clients }}"
+

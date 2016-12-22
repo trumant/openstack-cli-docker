@@ -1,0 +1,7 @@
+version: "1"
+defaults:
+  openstack_version: newton
+services:
+  "os_cli_{{ openstack_version }}":
+    image: ubuntu:xenial
+registries: {}

@@ -1,0 +1,27 @@
+#!/bin/bash
+
+os_version=$1
+
+[ $# -eq 0 ] && { echo "Usage: $0 openstack_version"; exit 1; }
+
+image_name="openstack-cli-docker-os_cli_$os_version"
+image_name_with_tag="${image_name}:latest"
+
+image_found=`docker images | grep $image_name`
+
+if [ $? -ne 0 ]; then
+  echo "$image_name was not found, try building it with: AC_OPENSTACK_VERSION=\"$os_version\" ansible-container build --from-scratch"
+else
+  docker run --rm -ti -e DOCKER_USER=$USER \
+                    -e OS_PROJECT_ID=$OS_PROJECT_ID \
+                    -e OS_TENANT_ID=$OS_TENANT_ID \
+                    -e OS_REGION_NAME=$OS_REGION_NAME \
+                    -e OS_USER_DOMAIN_NAME=$OS_USER_DOMAIN_NAME \
+                    -e OS_PROJECT_NAME=$OS_PROJECT_NAME \
+                    -e OS_TENANT_NAME=$OS_TENANT_NAME \
+                    -e OS_IDENTITY_API_VERSION=$OS_IDENTITY_API_VERSION \
+                    -e OS_AUTH_URL=$OS_AUTH_URL \
+                    -e OS_USERNAME=$OS_USERNAME \
+                    -e OS_PASSWORD=$OS_PASSWORD \
+    --volume $PWD:/`basename $PWD` --volume ~/:/$USER $image_name_with_tag /bin/bash
+fi

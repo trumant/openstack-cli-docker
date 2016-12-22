@@ -1,0 +1,10 @@
+galaxy_info:
+  author: Travis Truman
+  description: Build Docker containers with OpenStack CLI tools
+  company:
+  license: MIT
+
+  min_ansible_container_version: 0.2.0
+
+  tags:
+    - openstack
